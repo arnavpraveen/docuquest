@@ -1,56 +1,60 @@
 # DocuQuest
 
-DocuQuest is a retrieval-augmented question-answering system written in C++. It turns a collection of documents into a searchable knowledge base and produces answers grounded in retrieved source material.
+DocuQuest is a C++ retrieval-augmented question-answering system. It indexes a document collection, uses an LLM to translate a natural-language question into search-term groups, retrieves matching documents, and generates an answer grounded in the retrieved text.
 
-## Why I built it
-
-Long documents are difficult to search when the user does not know the exact terminology or location of an answer. DocuQuest explores how a compact C++ pipeline can combine document ingestion, retrieval, and answer generation while keeping the supporting context visible.
-
-## System design
+## Architecture
 
 ```mermaid
 flowchart LR
-    A[Documents] --> B[Parse and chunk]
-    B --> C[Build searchable index]
-    D[User question] --> E[Retrieve relevant passages]
-    C --> E
-    E --> F[Construct grounded prompt]
-    F --> G[Answer with source context]
+    A[Text documents] --> B[Tokenizer]
+    B --> C[Inverted index]
+    D[User question] --> E[LLM term generation]
+    E --> F[Grouped term retrieval]
+    C --> F
+    F --> G[Relevant documents]
+    G --> H[Grounded summarization prompt]
+    D --> H
+    H --> I[Final answer]
 ```
 
-## Core capabilities
+## How retrieval works
 
-- Ingests and processes document collections
-- Breaks content into retrieval-friendly passages
-- Finds passages relevant to a natural-language question
-- Builds answers from retrieved context instead of relying only on model memory
-- Preserves source context so results can be checked
+1. The tokenizer converts document text into lowercase alphanumeric terms.
+2. A custom binary-search-tree multimap stores each term and the documents containing it.
+3. The LLM generates up to 20 search-term groups from the user's question.
+4. Terms within a group are combined with intersection logic; results across groups are merged.
+5. The system deduplicates and sorts matches, then limits the grounded context to ten documents.
+6. A second prompt asks the LLM to answer using only the retrieved document text.
 
-## Engineering focus
+## Engineering highlights
 
-- C++ data structures and memory-conscious processing
-- Modular separation between ingestion, retrieval, and response generation
-- Clear failure handling for empty documents and low-confidence retrieval
-- Reproducible document-to-answer workflow
-
-## Demonstration flow
-
-1. Add one or more documents to the input collection.
-2. Run the ingestion and indexing stage.
-3. Submit a natural-language question.
-4. Inspect the retrieved passages.
-5. Review the generated answer alongside its source context.
+- Implemented a tokenizer with incremental iteration
+- Built a custom multimap on a binary search tree
+- Constructed an inverted document index
+- Used set intersection and deduplication for multi-term retrieval
+- Separated indexing, retrieval, prompt construction, and answer generation behind interfaces
+- Managed dynamically allocated polymorphic components with explicit cleanup
 
 ## Technology
 
-- C++
+- C++17
+- Custom data structures and iterators
+- File-system document ingestion
 - Retrieval-augmented generation
-- Document parsing and text chunking
-- Semantic retrieval
+- External LLM interface
+
+## Demonstration flow
+
+```text
+Loading documents...
+Indexed <document count> documents.
+Enter question: <natural-language question>
+<answer grounded in matching documents>
+```
 
 ## Repository status
 
-This repository is a public project case study. The original source code and demonstration assets are not included yet. They will be added after the project files are reviewed for course, team, and data-sharing restrictions.
+This public repository documents the design and implementation without publishing academic starter code, instructor-provided components, test documents, or a complete course solution. Source can be discussed privately when appropriate.
 
 ## Author
 
