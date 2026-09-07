@@ -43,6 +43,17 @@ flowchart LR
 - Retrieval-augmented generation
 - External LLM interface
 
+## Source code
+
+The `src/` directory contains my original implementations of the system's core components:
+
+- `tokenizer.*` - incremental text tokenization
+- `multimap.*` - binary-search-tree multimap and iterator
+- `index.*` - document ingestion and inverted indexing
+- `agent.*` - grouped retrieval and grounded answer generation
+
+The implementations depend on interfaces supplied by the UCLA course framework. Those instructor-provided files, generated test documents, build products, and credentials are intentionally not redistributed here, so this snapshot is intended for code review rather than as a standalone build.
+
 ## Demonstration flow
 
 ```text
@@ -54,7 +65,7 @@ Enter question: <natural-language question>
 
 ## Repository status
 
-This public repository documents the design and implementation without publishing academic starter code, instructor-provided components, test documents, or a complete course solution. Source can be discussed privately when appropriate.
+This repository includes my implementation code. Academic starter code, instructor-provided components, generated test documents, binaries, and local IDE state are excluded.
 
 ## Author
 
